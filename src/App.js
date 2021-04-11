@@ -8,6 +8,10 @@ import Particles from 'react-particles-js';
 import FaceRecognition from "./Components/FaceRecognition/FaceRecognition";
 import SignIn from "./Components/SignIn/SignIn";
 import Register from "./Components/Register/Register";
+import { config } from './Constants';
+
+const API_IMAGEURL = config.url.API_IMAGEURL
+const API_IMAGE = config.url.API_IMAGE
 
 const particleOption = {
     particles: {
@@ -24,7 +28,7 @@ const particleOption = {
 const initialState = {
     input: '',
     imageUrl: '',
-    identifyBox: {},
+    identifyBox: [],
     route: 'signin',
     isSignedIn: false,
     user:{
@@ -54,17 +58,21 @@ class App extends Component{
     }
 
     calculateFaceLocation = (data) => {
-        const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+        console.log(data.outputs[0].data.regions);
+        const clarifaiFace = data.outputs[0].data.regions.map(face_element => face_element.region_info.bounding_box);
         const image = document.getElementById('inputImage');
         const width = Number(image.width);
         const height = Number(image.height);
         console.log(width, height);
-        return{
-            leftCol: clarifaiFace.left_col* width,
-            topRow: clarifaiFace.top_row * height,
-            rightCol: width - (clarifaiFace.right_col * width),
-            bottomRow: height - (clarifaiFace.bottom_row * height)
-        }
+
+        return clarifaiFace.map(face => {
+            return {
+                leftCol: face.left_col * width,
+                topRow: face.top_row * height,
+                rightCol: width - (face.right_col * width),
+                bottomRow: height - (face.bottom_row * height)
+            }
+        });
     }
 
     displayIdentifyBox = (identifyBox) => {
@@ -79,7 +87,7 @@ class App extends Component{
 
     onSubmit = () => {
         this.setState({imageUrl: this.state.input});
-        fetch('https://afternoon-cliffs-12345.herokuapp.com/imageurl', {
+        fetch(API_IMAGEURL, {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -89,7 +97,7 @@ class App extends Component{
             .then(response => response.json())
             .then(response => {
                 if (response) {
-                    fetch('https://afternoon-cliffs-12345.herokuapp.com/image', {
+                    fetch(API_IMAGE, {
                         method: 'put',
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({

@@ -1,4 +1,7 @@
 import React from "react";
+import { config } from '../../Constants.js';
+
+const API_REGISTER = config.url.API_REGISTER
 
 //https://tachyons.io/components/forms/sign-in/index.html
 class Register  extends React.Component {
@@ -20,7 +23,7 @@ class Register  extends React.Component {
         this.setState({password: event.target.value});
     }
     onSubmitSignIn = () => {
-        fetch('https://afternoon-cliffs-12345.herokuapp.com/register', {
+        fetch(API_REGISTER, {
             method: 'post',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
