@@ -134,9 +134,9 @@ class App extends Component{
                     params={particleOption}
                 />
                 <Navigation isSignedIn={isSignedIn} onRouteChange = {this.onRouteChange}/>
+                <Logo/>
                 {route === 'home'
                     ? <div>
-                        <Logo/>
                         <Rank
                             name = {this.state.user.name}
                             entries = {this.state.user.entries}
